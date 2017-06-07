@@ -2,12 +2,25 @@ from config import *
 from coder import *
 import numpy as np
 from config import *
+import random
 import os
 
 def readScoreNetData():
     # Load name of files
     img_name_list = sorted(os.listdir(scorenet_img_path))
     dat_name_list = sorted(os.listdir(scorenet_dat_path))
+
+    # Shuffle
+    for i in range(len(img_name_list)/2):
+        swap_index_1 = random.randint(0, len(img_name_list))
+        swap_index_2 = random.randint(0, len(img_name_list))
+        _ = img_name_list[swap_index_1]
+        img_name_list[swap_index_1] = img_name_list[swap_index_2]
+        img_name_list[swap_index_2] = _
+        _ = dat_name_list[swap_index_1]
+        dat_name_list[swap_index_1] = dat_name_list[swap_index_2]
+        dat_name_list[swap_index_2] = _
+
     if len(img_name_list) != len(dat_name_list):
         print "file distribution is wrong..."
 
@@ -18,8 +31,6 @@ def readScoreNetData():
     y_train = np.ndarray([len(img_name_list),
         len(obj_name_2_index) * grid_height_num * grid_width_num  
     ])
-    print np.shape(x_train)
-    print np.shape(y_train)
 
     # Fill the list
     for i in range(len(img_name_list)):

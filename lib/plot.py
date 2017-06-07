@@ -110,71 +110,42 @@ def mergeSegmentAndScoringRes(img, result_segment, result_scoring, label_map, ed
         component_bucket[i] = np.argmax(component_bucket[i], axis=0)
 
     # ----------------------------------------------------------------------------------
+    # Get the critical point of each segments
+    # [   [min_x, min_y, max_x, max_y], [min_x, min_y, max_x, max_y], ... ]
+    # ----------------------------------------------------------------------------------
+    bbox_coordinate_list = np.asarray([[img_width, img_height, 0, 0]] * np.max(label_map))
+    for i in range(img_height):
+        for j in range(img_width):
+            if label_map[i][j] != 0:
+                bbox_coordinate_list[label_map[i][j]-1][0] = min(j, bbox_coordinate_list[label_map[i][j]-1][0])
+                bbox_coordinate_list[label_map[i][j]-1][1] = min(i, bbox_coordinate_list[label_map[i][j]-1][1])
+                bbox_coordinate_list[label_map[i][j]-1][2] = max(j, bbox_coordinate_list[label_map[i][j]-1][2])
+                bbox_coordinate_list[label_map[i][j]-1][3] = max(i, bbox_coordinate_list[label_map[i][j]-1][3])
+
+    # ----------------------------------------------------------------------------------
     # Plot the result of segmentation
     # ----------------------------------------------------------------------------------
     if fast_plot:
         res_img = coverEdge(img, edge_graph.astype(np.uint8))
-
+    else:
+        for i in range(len(bbox_coordinate_list)):
+            for j in range(bbox_coordinate_list[i][1] - 1, bbox_coordinate_list[i][3] + 1):
+                for k in range(bbox_coordinate_list[i][0] - 1, bbox_coordinate_list[i][2] + 1):
+                    if edge_graph[j][k] != 0:
+                        res_img[j][k] = [0, 0, 255]
+    
     # ----------------------------------------------------------------------------------
-    # Ploting classification
+    # Ploting Bounding box and classification
+    # (Select first 5th region)
     # ----------------------------------------------------------------------------------
-    for component_index in range(len(component_bucket)):
-        min_x = -1
-        max_x = -1
-        min_y = -1
-        max_y = -1
+    for i in range(min(len(bbox_coordinate_list), 5)):
+        bbox_p1 = (bbox_coordinate_list[i][0], bbox_coordinate_list[i][1])
+        bbox_p2 = (bbox_coordinate_list[i][2], bbox_coordinate_list[i][3])
+        text_p = (int(round((bbox_coordinate_list[i][0] + bbox_coordinate_list[i][2])/2)), bbox_coordinate_list[i][1])
 
-        # Find the position coordinate
-        has_found = False
-        for i in range(grid_height_num):
-            has_change = False
-            for j in range(grid_width_num):
-                if has_response_map[i][j]:
-                    if fast_plot:
-                        init_height = i * grid_height
-                        last_height = i * grid_height + grid_height
-                        init_width = j * grid_width
-                        last_width = j * grid_width + grid_width
-                    else:
-                        init_height = i * grid_height - grid_height
-                        last_height = i * grid_height + 2 * grid_height
-                        init_width = j * grid_width - grid_width
-                        last_width = j * grid_width + 2 * grid_width
-
-                    # Check the segment position for specific area
-                    for k in range(init_height, last_height):
-                        for m in range(init_width, last_width):
-                            if not fast_plot:
-                                if edge_graph[k][m] != 0:
-                                    res_img[k][m] = [0, 0, 255]
-
-                            if label_map[k][m] != 0:
-                                if component_bucket[label_map[k][m]-1] == component_index:
-                                    has_found = True
-                                    has_change = True
-                                    if min_x == -1:
-                                        min_x = m
-                                    else:
-                                        min_x = min(min_x, m)
-                                    max_x = max(max_x, m)
-                                    if min_y == -1:
-                                        min_y = k
-                                    else:
-                                        min_y = min(min_y, k)
-                                    max_y = max(max_y, k)
-            if has_found == True and has_change == False:
-                break        
-
-        # Form the point tuple
-        box_p1 = (min_x, min_y)
-        box_p2 = (max_x, max_y)
-        text_p = (int(round((min_x + max_x)/2)), min_y)
-
-        # Draw
-        class_index = component_bucket[component_index]
-        cv2.rectangle(res_img, box_p1, box_p2, 
-                    obj_index_2_response_color_tuple[class_index], thickness=2)
-
+        class_index = component_bucket[i]
+        cv2.rectangle(res_img, bbox_p1, bbox_p2, 
+            obj_index_2_response_color_tuple[class_index], thickness=2)
         cv2.putText(res_img, obj_index_2_name[class_index], text_p, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
-    return res_img
 
+    return res_img

@@ -75,9 +75,9 @@ def postProcThread():
     global kernel
 
     # Generate laplacian edge image
+    segment_input = cv2.dilate(segment_input, kernel)
     _, result_segment_lap = cv2.threshold(segment_input, 127, 255, cv2.THRESH_BINARY)
     result_segment_lap = cv2.Laplacian(result_segment_lap, cv2.CV_32F)
-    result_segment_lap = cv2.dilate(result_segment_lap, kernel)
     segment_input = segment_input.astype(np.uint8)
     
     # Merge the segment and scoring result
@@ -86,7 +86,7 @@ def postProcThread():
         scoring_input,
         cv2.connectedComponents(segment_input, 4, cv2.CV_32S)[1],
         result_segment_lap,
-        fast_plot=True
+        fast_plot=False
     )
 
 if __name__ == '__main__':
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     scoring_model = ScoreNet(save_path='model/scorenet.h5')
 
     # Start video
-    cap = cv2.VideoCapture('video/1.mp4')
+    cap = cv2.VideoCapture('video/2.mp4')
     """
     while cap.isOpened():
         _, frame = cap.read()
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     frame_fetch = None
 
     # Looping
-    for i in range(150):
+    for i in range(181):
         if is_cap_open:
             _time = time.time()
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             cv2.imshow('segment', result_segment_lap)
             cv2.imshow('scoring', coder.decodeByVector(show_frame, scoring_input))
             #cv2.resize(result_final, (0, 0), fx=1.5, fy=1.5)
-            cv2.imshow('final', result_final)
+            cv2.imshow('final', cv2.resize(result_final, (0, 0), fx=1.5, fy=1.5))
 
             # Move window to regid position
             cv2.moveWindow('origin', 200, 0)

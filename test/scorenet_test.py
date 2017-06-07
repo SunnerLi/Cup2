@@ -6,10 +6,10 @@ import coder
 import time
 import cv2
 
-img_dir = '../img/scorenet/frame075.bmp'
+img_dir = '../img/scorenet/frame090.bmp'
 
 # Test
-model = ScoreNet(save_name='../model/scorenet.h5')
+model = ScoreNet(save_path='../model/scorenet.h5')
 model.compile()
 x_test = np.expand_dims(cv2.imread(img_dir), axis=0)
 _time = time.time()

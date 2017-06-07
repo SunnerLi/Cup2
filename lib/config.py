@@ -32,4 +32,4 @@ scorenet_dat_path = '../dat/'
 # ?
 scorenet_fc_num = len(obj_name_2_index) * grid_height_num * grid_width_num
 
-general_epoch = 40
+general_epoch = 100
