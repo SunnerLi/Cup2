@@ -12,8 +12,8 @@ def readScoreNetData():
 
     # Shuffle
     for i in range(len(img_name_list)/2):
-        swap_index_1 = random.randint(0, len(img_name_list))
-        swap_index_2 = random.randint(0, len(img_name_list))
+        swap_index_1 = random.randint(0, len(img_name_list)-1)
+        swap_index_2 = random.randint(0, len(img_name_list)-1)
         _ = img_name_list[swap_index_1]
         img_name_list[swap_index_1] = img_name_list[swap_index_2]
         img_name_list[swap_index_2] = _

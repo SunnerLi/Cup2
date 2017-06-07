@@ -131,7 +131,7 @@ if __name__ == '__main__':
     frame_fetch = None
 
     # Looping
-    for i in range(181):
+    for i in range(180):
         if is_cap_open:
             _time = time.time()
 

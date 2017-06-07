@@ -34,7 +34,7 @@ class ScoreNet(object):
 
         # FC
         self.model.add(Flatten())
-        self.model.add(Dense(scorenet_fc_num, activation='sigmoid'))
+        self.model.add(Dense(scorenet_fc_num, activation='relu'))
 
         # Load model if exist
         self.save_path = save_path
