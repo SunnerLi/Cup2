@@ -3,7 +3,7 @@ from lib.config import *
 import cv2
 import os
 
-img_path_dir = './xml/'
+img_path_dir = './img/'
 
 def resize(img_path_dir):
     for name in os.listdir(img_path_dir):
@@ -14,12 +14,13 @@ def resize(img_path_dir):
 
 def addPrefix(img_path_dir, prefix_sentence):
     for name in os.listdir(img_path_dir):
-        if name[-4:] == '.xml':
+        if name[-4:] == '.bmp':
             os.rename(img_path_dir + name, img_path_dir + prefix_sentence + name)
 
 def deletePrefix(img_path_dir):
     for name in os.listdir(img_path_dir):
-        if name[-4:] == '.xml':
+        if name[-4:] == '.bmp':
             os.rename(img_path_dir + name, img_path_dir + name[7:])
 
-addPrefix(img_path_dir, 'video1_')
+#deletePrefix(img_path_dir)
+addPrefix(img_path_dir, 'video6_')

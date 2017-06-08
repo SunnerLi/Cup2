@@ -1,0 +1,26 @@
+<annotation verified="no">
+  <folder>img</folder>
+  <filename>video6_frame180</filename>
+  <path>/home/sunner/Save/Cup2/img/video6_frame180.bmp</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>480</width>
+    <height>270</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>law</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>233</xmin>
+      <ymin>140</ymin>
+      <xmax>336</xmax>
+      <ymax>209</ymax>
+    </bndbox>
+  </object>
+</annotation>

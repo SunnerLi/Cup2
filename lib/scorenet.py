@@ -50,7 +50,7 @@ class ScoreNet(object):
         )
 
     def train(self, x, y):
-        self.model.fit(x, y, batch_size=8, epochs=general_epoch, verbose=1)
+        self.model.fit(x, y, batch_size=16, epochs=general_epoch, verbose=1)
         self.model.save(self.save_path)
 
     def test(self, x):
