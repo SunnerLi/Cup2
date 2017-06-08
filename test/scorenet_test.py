@@ -6,7 +6,7 @@ import coder
 import time
 import cv2
 
-img_dir = '../img/scorenet/frame090.bmp'
+img_dir = '../img/scorenet/video6_frame090.bmp'
 
 # Test
 model = ScoreNet(save_path='../model/scorenet.h5')

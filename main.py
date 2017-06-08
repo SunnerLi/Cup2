@@ -48,7 +48,8 @@ def fetchImgThread():
     global frame_fetch
     _, frame = cap.read()
     is_cap_open = _
-    frame_fetch = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    #frame_fetch = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    frame_fetch = cv2.resize(frame, (480, 270))
 
 def deepThread():
     global segment_model
@@ -58,13 +59,14 @@ def deepThread():
     global graph
     global sess
     
-    with graph.as_default():
-        result_segment = segment_model.test(
-            np.expand_dims(frame_process, 0)
-        )
-        result_scoring = scoring_model.test(
-            np.expand_dims(frame_process, 0)
-        )        
+    with tf.device('/gpu:0'):
+    	with graph.as_default():
+    	    result_segment = segment_model.test(
+    	        np.expand_dims(frame_process, 0)
+    	    )
+    	    result_scoring = scoring_model.test(
+    	        np.expand_dims(frame_process, 0)
+    	    )        
 
 def postProcThread():
     global show_frame
@@ -95,43 +97,36 @@ if __name__ == '__main__':
     scoring_model = ScoreNet(save_path='model/scorenet.h5')
 
     # Start video
-    cap = cv2.VideoCapture('video/2.mp4')
-    """
+    cap = cv2.VideoCapture('./video/5.mp4')
     while cap.isOpened():
-        _, frame = cap.read()
-        frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            break
-    """    
-    # Grab 1st frame
-    fetch_thread = threading.Thread(target=fetchImgThread)
-    fetch_thread.start()
-    fetch_thread.join(1)
 
-    # Pass the input object and clean the previous status
-    frame_process = np.copy(frame_fetch)
-    frame_fetch = None
+        # Grab 1st frame
+        fetch_thread = threading.Thread(target=fetchImgThread)
+        fetch_thread.start()
+        fetch_thread.join(1)
 
-    # Grab 2nd frame
-    fetch_thread = threading.Thread(target=fetchImgThread)
-    deep_thread = threading.Thread(target=deepThread)
-    fetch_thread.start()
-    deep_thread.start()
-    fetch_thread.join(5)
-    deep_thread.join(5)
+        # Pass the input object and clean the previous status
+        frame_process = np.copy(frame_fetch)
+        frame_fetch = None
 
-    # Pass the input object and clean the previous status
-    show_frame = np.copy(frame_process)
-    segment_input = np.copy(result_segment[0])
-    scoring_input = np.copy(result_scoring)
-    result_segment = None
-    result_scoring = None
-    frame_process = np.copy(frame_fetch)
-    frame_fetch = None
+        # Grab 2nd frame
+        fetch_thread = threading.Thread(target=fetchImgThread)
+        deep_thread = threading.Thread(target=deepThread)
+        fetch_thread.start()
+        deep_thread.start()
+        fetch_thread.join(5)
+        deep_thread.join(5)
 
-    # Looping
-    for i in range(180):
+        # Pass the input object and clean the previous status
+        show_frame = np.copy(frame_process)
+        segment_input = np.copy(result_segment[0])
+        scoring_input = np.copy(result_scoring)
+        result_segment = None
+        result_scoring = None
+        frame_process = np.copy(frame_fetch)
+        frame_fetch = None
+
+        is_cap_open = cap.isOpened()
         if is_cap_open:
             _time = time.time()
 
@@ -176,8 +171,16 @@ if __name__ == '__main__':
             result_scoring = None
             frame_process = np.copy(frame_fetch)
             frame_fetch = None
+
+            break_index += 1
+
         else:
             print "failt..."
             continue
 
+
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
+    
+    
     cap.release()
