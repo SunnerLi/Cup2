@@ -43,67 +43,80 @@ scoring_input = None
 result_segment_lap = None
 result_final = None
 
-def fetchImgThread():
-    global cap
-    global is_cap_open
-    global frame_fetch
-    _, frame = cap.read()
-    is_cap_open = _
-    frame_fetch = cv2.resize(frame, (480, 270))
+class fetchImgThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
 
-def deepThread():
-    global segment_model
-    global frame_process
-    global result_segment
-    global result_scoring
-    global graph
-    global sess
-    global frame_index
+    def start(self):
+        threading.Thread.__init__(self)
+        threading.Thread.start(self)
+
     
-    _time = time.time()
-    with tf.device('/gpu:0'):
-    	with graph.as_default():
-    	    result_segment = segment_model.test(
-    	        np.expand_dims(frame_process, 0)
-    	    )
+    def join(self, _sec):
+        threading.Thread.join(self, _sec)
+
+    def run(self):
+        global cap
+        global is_cap_open
+        global frame_fetch
+        _, frame = cap.read()
+        is_cap_open = _
+        frame_fetch = cv2.resize(frame, (480, 270))
+
+class deepThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+    def start(self):
+        threading.Thread.__init__(self)
+        threading.Thread.start(self)
+
+    def join(self, _sec):
+        threading.Thread.join(self, _sec)
+
+    def run(self):
+        global segment_model
+        global frame_process
+        global result_segment
+        global result_scoring
+        global graph
+        global sess
+        global frame_index
+
+        with graph.as_default():
+            result_segment = segment_model.test(
+                np.expand_dims(frame_process, 0)
+            )
             if frame_index % 3 == 0:
-    	        result_scoring = scoring_model.test(
-    	            np.expand_dims(frame_process, 0)
-    	        )      
-    #print "deep time: ", time.time() - _time  
+                result_scoring = scoring_model.test(
+                    np.expand_dims(frame_process, 0)
+                )      
 
-def postProcThread():
-    global show_frame
-    global segment_input
-    global scoring_input
-    global result_segment_lap
-    global result_final
-    global kernel
+class postProcThread(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
 
-    """
-    # Generate laplacian edge image
-    segment_input = cv2.dilate(segment_input, kernel)
-    _, result_segment_lap = cv2.threshold(segment_input, 127, 255, cv2.THRESH_BINARY)
-    result_segment_lap = cv2.Laplacian(result_segment_lap, cv2.CV_32F)
-    segment_input = segment_input.astype(np.uint8)
-    """
-    
-    # Merge the segment and scoring result
-    """
-    result_final = mergeSegmentAndScoringRes(show_frame, 
-        segment_input, 
-        scoring_input,
-        cv2.connectedComponents(segment_input, 4, cv2.CV_32S)[1],
-        fast_plot=False
-    )
-    """
-    _time = time.time()
-    result_final = mergeSegmentAndScoringRes(show_frame, 
-        segment_input, 
-        scoring_input,
-        fast_plot=False
-    )
-    #print "draw time: ", time.time() - _time  
+    def start(self):
+        threading.Thread.__init__(self)
+        threading.Thread.start(self)
+
+    def join(self, _sec):
+        threading.Thread.join(self, _sec)
+
+    def run(self):
+        global show_frame
+        global segment_input
+        global scoring_input
+        global result_segment_lap
+        global result_final
+        global kernel
+
+        # Merge the segment and scoring result
+        result_final = mergeSegmentAndScoringRes(show_frame, 
+            segment_input, 
+            scoring_input,
+            fast_plot=False
+        )
 
 if __name__ == '__main__':
     # Load model
@@ -113,8 +126,12 @@ if __name__ == '__main__':
     # Start video
     cap = cv2.VideoCapture('./video/1.mp4')
 
+    # Define the thread object
+    fetch_thread = fetchImgThread()
+    deep_thread = deepThread()
+    post_proc_thread = postProcThread()
+
     # Grab 1st frame
-    fetch_thread = threading.Thread(target=fetchImgThread)
     fetch_thread.start()
     fetch_thread.join(1)
 
@@ -123,8 +140,6 @@ if __name__ == '__main__':
     frame_fetch = None
 
     # Grab 2nd frame
-    fetch_thread = threading.Thread(target=fetchImgThread)
-    deep_thread = threading.Thread(target=deepThread)
     fetch_thread.start()
     deep_thread.start()
     fetch_thread.join(5)
@@ -144,11 +159,6 @@ if __name__ == '__main__':
         if is_cap_open:
             _time = time.time()
 
-            # Define the continuous works
-            fetch_thread = threading.Thread(target=fetchImgThread)
-            deep_thread = threading.Thread(target=deepThread)
-            post_proc_thread = threading.Thread(target=postProcThread)
-
             # Start work and wait the worker done
             fetch_thread.start()
             deep_thread.start()
@@ -161,7 +171,6 @@ if __name__ == '__main__':
             cv2.imshow('origin', show_frame)
             cv2.imshow('segment', segment_input)
             cv2.imshow('scoring', coder.decodeByVector(show_frame, scoring_input))
-            #cv2.resize(result_final, (0, 0), fx=1.5, fy=1.5)
             cv2.imshow('final', cv2.resize(result_final, (0, 0), fx=1.5, fy=1.5))
 
             # Move window to regid position
@@ -171,7 +180,6 @@ if __name__ == '__main__':
             cv2.moveWindow('final', 600, 300)
 
             if timer > 1.0:
-                # print "frame index: ", frame_index, "\ttime spend: ", time.time() - _time
                 print "fps: ", fps_index / timer
                 fps_index = 0
                 timer = 0
