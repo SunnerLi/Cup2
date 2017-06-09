@@ -1,4 +1,8 @@
 # Cup2
+[![Packagist](https://img.shields.io/badge/Python-2.7-blue.svg)]() 
+[![Packagist](https://img.shields.io/badge/Keras-2.0.4-blue.svg)]()
+[![Packagist](https://img.shields.io/badge/Keras_Backend-Tensorflow-brightgreen.svg)]()
+[![Packagist](https://img.shields.io/badge/Tensorflow-1.1.0-blue.svg)]()</br>   
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/SunnerLi/Cup2/master/img/readme_img/cup_recog.gif?token=AK99R1f9GVRjjumWtjfFQAIUJOVFj0Wvks5ZQpqAwA%3D%3D" width=480 height=270/>

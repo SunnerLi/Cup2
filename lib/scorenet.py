@@ -10,7 +10,7 @@ K.set_image_dim_ordering('tf')
 
 class ScoreNet(object):
     save_path = None
-    def __init__(self, save_path='scorenet.h5', use_VGG=False):
+    def __init__(self, save_path='47.h5', use_VGG=False):
         self.model = Sequential()
 
         

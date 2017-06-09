@@ -14,34 +14,34 @@ class UNet():
         input = Input((height, width, 3))
 
         # 1st down
-        conv1 = Conv2D(16, (3, 3), activation='relu')(input)
-        conv1 = Conv2D(16, (3, 3), activation='relu')(conv1)
+        conv1 = Conv2D(8, (3, 3), activation='relu')(input)
+        conv1 = Conv2D(8, (3, 3), activation='relu')(conv1)
         pool1 = MaxPooling2D()(conv1)
 
         # 2nd down
-        conv2 = Conv2D(32, (3, 3), activation='relu')(pool1)
-        conv2 = Conv2D(32, (3, 3), activation='relu')(conv2)
+        conv2 = Conv2D(16, (3, 3), activation='relu')(pool1)
+        conv2 = Conv2D(16, (3, 3), activation='relu')(conv2)
         pool2 = MaxPooling2D()(conv2)
 
         # 3rd down
-        conv3 = Conv2D(64, (3, 3), activation='relu')(pool2)
-        conv3 = Conv2D(64, (3, 3), activation='relu')(conv3)
+        conv3 = Conv2D(32, (3, 3), activation='relu')(pool2)
+        conv3 = Conv2D(32, (3, 3), activation='relu')(conv3)
         
         # 1st up
         up1 = UpSampling2D()(conv3)
         h, w = self.get_crop_shape(conv2, up1)
         crop1 = Cropping2D(cropping=((h, w)))(conv2) 
         dconv1 = concatenate([up1, crop1], axis=3)
-        conv4 = Conv2D(32, (3, 3), activation='relu')(dconv1)
-        conv4 = Conv2D(32, (3, 3), activation='relu')(conv4)
+        conv4 = Conv2D(16, (3, 3), activation='relu')(dconv1)
+        conv4 = Conv2D(16, (3, 3), activation='relu')(conv4)
 
         # 2nd up
         up2 = UpSampling2D()(conv4)
         h, w = self.get_crop_shape(conv1, up2)
         crop2 = Cropping2D(cropping=((h, w)))(conv1)
         dconv1 = concatenate([up2, crop2], axis=3)
-        conv5 = Conv2D(16, (3, 3), activation='relu')(dconv1)
-        conv5 = Conv2D(16, (3, 3), activation='relu')(conv5)
+        conv5 = Conv2D(8, (3, 3), activation='relu')(dconv1)
+        conv5 = Conv2D(8, (3, 3), activation='relu')(conv5)
 
         # Final crop
         h, w = self.get_crop_shape(input, conv5)
