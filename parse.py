@@ -6,6 +6,12 @@ xml_dir = './xml/'
 dat_dir = './dat/'
 
 def parse(file_name):
+    """
+        Parse the PASCAL-format description file and transfer into my own format
+
+        Arg:    The name of PASCAL-format description file
+        Ret:    The information string
+    """
     info = etree.iterparse(file_name)
     string = ""
     for tag, element in info:

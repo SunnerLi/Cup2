@@ -21,6 +21,7 @@ is_cap_open = False
 segment_model = None
 scoring_model = None
 
+# break variable and timer to calculate fps
 frame_index = 0
 timer = 0.0
 fps_index = 0
@@ -44,13 +45,15 @@ result_segment_lap = None
 result_final = None
 
 class fetchImgThread(threading.Thread):
+    """
+        The thread to fetch the image in each duration
+    """
     def __init__(self):
         threading.Thread.__init__(self)
 
     def start(self):
         threading.Thread.__init__(self)
         threading.Thread.start(self)
-
     
     def join(self, _sec):
         threading.Thread.join(self, _sec)
@@ -64,6 +67,9 @@ class fetchImgThread(threading.Thread):
         frame_fetch = cv2.resize(frame, (480, 270))
 
 class deepThread(threading.Thread):
+    """
+        The thread to do the segmentation and classification
+    """
     def __init__(self):
         threading.Thread.__init__(self)
 
@@ -93,6 +99,9 @@ class deepThread(threading.Thread):
                 )      
 
 class postProcThread(threading.Thread):
+    """
+        The thread to merge the whole result into one image
+    """
     def __init__(self):
         threading.Thread.__init__(self)
 
@@ -113,9 +122,7 @@ class postProcThread(threading.Thread):
 
         # Merge the segment and scoring result
         result_final = mergeSegmentAndScoringRes(show_frame, 
-            segment_input, 
-            scoring_input,
-            fast_plot=False
+            segment_input, scoring_input
         )
 
 if __name__ == '__main__':
@@ -124,7 +131,7 @@ if __name__ == '__main__':
     scoring_model = ScoreNet(save_path='model/47.h5')
 
     # Start video
-    cap = cv2.VideoCapture('./video/1.mp4')
+    cap = cv2.VideoCapture(video_name)
 
     # Define the thread object
     fetch_thread = fetchImgThread()
@@ -155,65 +162,58 @@ if __name__ == '__main__':
     frame_fetch = None
 
     while cap.isOpened():
-        is_cap_open = cap.isOpened()
-        if is_cap_open:
-            _time = time.time()
+        _time = time.time()
 
-            # Start work and wait the worker done
-            fetch_thread.start()
-            deep_thread.start()
-            post_proc_thread.start()
-            fetch_thread.join(5)
-            deep_thread.join(5)
-            post_proc_thread.join(5)
+        # Start work and wait the worker done
+        fetch_thread.start()
+        deep_thread.start()
+        post_proc_thread.start()
+        fetch_thread.join(5)
+        deep_thread.join(5)
+        post_proc_thread.join(5)
             
-            # Show the result
-            cv2.imshow('origin', show_frame)
-            cv2.imshow('segment', segment_input)
-            cv2.imshow('scoring', coder.decodeByVector(show_frame, scoring_input))
-            cv2.imshow('final', cv2.resize(result_final, (0, 0), fx=1.5, fy=1.5))
+        # Show the result
+        cv2.imshow('origin', show_frame)
+        cv2.imshow('segment', segment_input)
+        cv2.imshow('scoring', coder.decodeByVector(show_frame, scoring_input))
+        cv2.imshow('final', cv2.resize(result_final, (0, 0), fx=1.5, fy=1.5))
 
-            # Move window to regid position
-            cv2.moveWindow('origin', 200, 0)
-            cv2.moveWindow('segment', 200, 300)
-            cv2.moveWindow('scoring', 600, 0)
-            cv2.moveWindow('final', 600, 300)
+        # Move window to regid position
+        cv2.moveWindow('origin', 200, 0)
+        cv2.moveWindow('segment', 200, 300)
+        cv2.moveWindow('scoring', 600, 0)
+        cv2.moveWindow('final', 600, 300)
 
-            if timer > 1.0:
-                print "fps: ", fps_index / timer
-                fps_index = 0
-                timer = 0
+        # Pring fps
+        if timer > 1.0:
+            print "fps: ", fps_index / timer
+            fps_index = 0
+            timer = 0
 
-            if (cv2.waitKey(1) & 0xFF == ord('q')):
-                break
-            if frame_index > 500:
-                break
-
-            # Pass the input object and clean the previous status
-            result_segment_lap = None
-            result_final = None
-            show_frame = np.copy(frame_process)
-            segment_input = np.copy(result_segment[0])
-            scoring_input = np.copy(result_scoring)
-            result_segment = None
-
-            if frame_index % 3 == 2:
-                result_scoring = None
-
-            frame_process = np.copy(frame_fetch)
-            frame_fetch = None
-
-            frame_index += 1
-            fps_index += 1
-            timer += (time.time() - _time)
-
-        else:
-            print "failt..."
-            continue
-
-
-        if cv2.waitKey(10) & 0xFF == ord('q'):
+        # judge if we want to break
+        if (cv2.waitKey(1) & 0xFF == ord('q')):
             break
-    
-    
+        if not unicode(video_name).isnumeric():
+            if frame_index > break_frame_index:
+                break
+
+        # Pass the input object and clean the previous status
+        result_segment_lap = None
+        result_final = None
+        show_frame = np.copy(frame_process)
+        segment_input = np.copy(result_segment[0])
+        scoring_input = np.copy(result_scoring)
+        result_segment = None
+
+        # Clear the scoring result if predict ScoreNet in next frame
+        if frame_index % 3 == 2:
+            result_scoring = None
+        frame_process = np.copy(frame_fetch)
+        frame_fetch = None
+
+        # Update fps computation variable
+        frame_index += 1
+        fps_index += 1
+        timer += (time.time() - _time)
+
     cap.release()

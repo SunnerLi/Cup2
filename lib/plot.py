@@ -44,16 +44,13 @@ def coverEdge(origin_img, edge_img):
     res = cv2.add(img_bg.astype(np.uint8), img_fg.astype(np.uint8))
     return res
 
-def mergeSegmentAndScoringRes(img, result_segment, result_scoring, 
-    fast_plot=True):
+def mergeSegmentAndScoringRes(img, result_segment, result_scoring):
     """
         Merge the segment and scoring result into the original image
 
         Arg:    img             - The original image
                 result_segment  - The predict result after conducting the UNet
                 result_scoring  - The predict result after conducting the scoring net
-                label_map       - The result after conducting the connected component process
-                edge_graph      - The edge image after doing the laplacian process
         Ret:    The image with merge result
     """
     # Copy image to prevent revised the original one

@@ -45,7 +45,6 @@ class UNet():
 
         # Final crop
         h, w = self.get_crop_shape(input, conv5)
-        print h, w
         padding = ZeroPadding2D(padding=(h[0], w[0]))(conv5)
         conv6 = Conv2D(1, (1, 1), activation='relu')(padding)
 

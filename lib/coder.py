@@ -28,6 +28,12 @@ def isFullIntersec(item1_p1, item1_p2, item2_p1, item2_p2):
     return False 
 
 def getObjInfoList(dat_name):
+    """
+        Get the information list of whole objects in the specific .dat name
+
+        Arg:    dat_name    - The dat file name
+        Ret:    The object information list
+    """
     with open(dat_name, 'r') as f:
         number_of_obj = int(f.readline())
         info = f.readlines()
@@ -42,6 +48,13 @@ def getObjInfoList(dat_name):
     return info
 
 def drawObjBBox(img, dat_name):
+    """
+        Draw the bounding box by the corresponding description file
+
+        Arg:    img         - The image numpy object
+                dat_name    - The name of dat file
+        Ret:    The result image numpy object
+    """
     info = getObjInfoList(dat_name)
     res = np.copy(img)
     for object_dict in info:
@@ -50,6 +63,13 @@ def drawObjBBox(img, dat_name):
     return res
 
 def drawGridBox(img, dat_name):
+    """
+        Draw the grid box which has object in the area
+
+        Arg:    img         - The image numpy object
+                dat_name    - The name of dat file 
+        Ret:    The result image numpy object
+    """
     global grid_height
     global grid_width
 
@@ -87,6 +107,10 @@ def drawGridBox(img, dat_name):
 def encodeByFile(img, dat_name):
     """
         Encode the image as the vector by the description file
+
+        Arg:    img         - The image numpy object
+                dat_name    - The name of dat file 
+        Ret:    Reshaped 1-D encode vector
     """
     global grid_height
     global grid_width
@@ -163,6 +187,12 @@ def encodeByFile(img, dat_name):
     return np.reshape(scores, [-1])
 
 def decodeByVector(img, vector):
+    """
+        Decode the imformation contained in the vector and draw on the image
+
+        Arg:    img     - The image numpy object
+                vector  - The encoded vector which contain the grid response
+    """
     global grid_height
     global grid_width
 

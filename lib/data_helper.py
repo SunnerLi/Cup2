@@ -6,6 +6,11 @@ import random
 import os
 
 def readScoreNetData():
+    """
+        Read the training data for the ScoreNet
+
+        Ret:    The training data tuple of the x and y
+    """
     # Load name of files
     img_name_list = sorted(os.listdir(scorenet_img_path))
     dat_name_list = sorted(os.listdir(scorenet_dat_path))
@@ -42,6 +47,11 @@ def readScoreNetData():
     return (x_train, y_train)
 
 def readUNetData(save_path='../img/unet/'):
+    """
+        Read the whole training data for the UNet
+
+        Ret:    The training data tuple and the testing data tuple
+    """
     # Read Training data
     train_x, train_y = readDataSingleFolder(save_path + 'train/')
 
@@ -51,6 +61,11 @@ def readUNetData(save_path='../img/unet/'):
     return (train_x, train_y), (test_x, test_y)
 
 def readDataSingleFolder(save_path):
+    """
+        Read the training data from the specific folder for the UNet
+
+        Ret:    The data tuple
+    """
     img_name_list = sorted(os.listdir(save_path))
     if len(img_name_list) % 2 == 1:
         print "image number error..."
