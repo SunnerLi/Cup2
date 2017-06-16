@@ -5,7 +5,7 @@
 [![Packagist](https://img.shields.io/badge/Tensorflow-1.1.0-blue.svg)]()</br>   
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/SunnerLi/Cup2/master/img/readme_img/cup_recog.gif?token=AK99R1f9GVRjjumWtjfFQAIUJOVFj0Wvks5ZQpqAwA%3D%3D" width=480 height=270/>
+  <img src="https://github.com/SunnerLi/Cup2/blob/master/img/readme_img/cup_recog.gif" width=480 height=270/>
 </p> 
 
 

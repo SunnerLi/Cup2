@@ -39,7 +39,7 @@ video_name = './video/1.mp4'
 break_frame_index = 50
 
 # Keras training epoch
-general_epoch = 200
+general_epoch = 1
 
 # Grid number (Defined)
 grid_height_num = 9
