@@ -20,7 +20,7 @@ Idea
 
 <br/>
 
-The whole tasks can be divide as two parts: segmentation and classification. This program refer the UNet structure to build a convolutional neural network with downsample and upsample processes. This model can get the segmentation graph in advance. Next, the thinking of YOLO is used to build the convolutional neural network that the grids should predict the object scores. 
+The whole tasks can be divide as two parts: segmentation and classification. This program refer the UNet structure to build a convolutional neural network with downsample and upsample processes. This model can get the segmentation graph in advance. Next, the thinking of YOLO[1] is used to build the convolutional neural network that the grids should predict the object scores. 
 
 In the implementation of scoring model, there're two structure we have provided: simple one and simplified VGG16. You can set the `use_VGG` flag to switch the structure. 
 
@@ -72,3 +72,8 @@ $ python parse.py
 How to Label
 ---
 There's no program can help you to label the training data of UNet. However, you can use [this](https://github.com/tzutalin/labelImg) to generate the `.xml` files toward ScoreNet. The label program can generate the PASCAL-format xml file which is the only acceptable format in this project. 
+
+Reference
+---
+[1]	J.Redmon, S.Divvala, R.Girshick, and A.Farhadi, “【YOLO】You only look once: Unified, real-time object detection,” _Cvpr,_ 2016.
+
